@@ -2,18 +2,14 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 import numpy as np
-import pickle
 
-import matplotlib.pyplot as plt
-plt.style.use('seaborn')
 from hmmlearn import hmm
 import warnings
-import matplotlib.pyplot as plt
-from hmmlearn import hmm
+import datetime
 
 #The function
 @st.cache(allow_output_mutation=True)
-def plot_hmm_px(state, metric='cases', dates_of_interest=None, hmm_plot=False, n_components=3):
+def plot_hmm_px(state, metric='cases', dates_of_interest=None, hmm_plot=False, n_components=3, fig_type = 'Normalized Daily Change'):
     '''
     You can switch metric to 'deaths' if you want.
     
@@ -26,25 +22,38 @@ def plot_hmm_px(state, metric='cases', dates_of_interest=None, hmm_plot=False, n
     state_diff = state_df.diff()
     state_diff.dropna(inplace=True)
     X = state_diff[[metric]]
+    Xcuml = state_df[[metric]]
 
 
-    #plt.figure(figsize=(14, 4))
     
-    fig = px.line(X/(X.max() - X.min()),title=f'{state.title()} Daily COVID-19 {metric.capitalize()} Change')
+    fig = px.line(X/(X.max() - X.min()),title=f'{state.title()} Daily COVID-19 {metric.capitalize()} Change, Normalized')
+    fig_abs_change = px.line(X,title=f'{state.title()} Daily COVID-19 {metric.capitalize()} Change')
+    fig_cuml_change = px.line(Xcuml,title=f'{state.title()} Daily Total COVID-19 {metric.capitalize()}')
+
     
+    fig.update_xaxes(title_text='Date')
+    fig_abs_change.update_xaxes(title_text='Date')
+    fig_cuml_change.update_xaxes(title_text='Date')
+    
+    fig.update_yaxes(title_text=f'Daily New {metric.capitalize()}, Normalized')
+    fig_abs_change.update_yaxes(title_text=f'Daily New {metric.capitalize()}')
+    fig_cuml_change.update_yaxes(title_text=f'Total {metric.capitalize()}')
+
+
     if dates_of_interest:
-        i=0
-        j=0
-        k=0
         for date in dates_of_interest:
-            fig.add_shape(type="line",x0 =date,x1=date,y0=0,y1=1.1)
-            #fig.add_scatter(x=(date,date),y=(0,1.1),line={'color': f'rgb({i},{j},{k})','width': 2,}, name='Superspreader')
-            #plt.axvline(x=date, label=date, color='black')
-    
+             fig.add_scatter(x=(date,date),y=(0,1.1),line={'color': f'rgb(0,0,0)','width': 2,}, name=f'Superspreader')
+             fig_abs_change.add_scatter(x=(date,date),y=(0,X.max()[0]),line={'color': f'rgb(0,0,0)','width': 2,}, name='Superspreader')
+   
     if (hmm_plot=='Yes'):  
         model = hmm.GaussianHMM(n_components=n_components)
         model.fit(X)
         preds = model.predict(X) / 2
         fig.add_scatter(x=X.index, y=preds, name='Regime')
     
-    return fig
+    if fig_type == 'Relative Normalized Daily Change':
+        return fig
+    elif fig_type == 'Relative Daily Change':
+        return fig_abs_change
+    elif fig_type == 'Cumulative Daily Change':  
+        return fig_cuml_change
