@@ -6,9 +6,9 @@
 The following is a Streamlit Application that allows the user to plot COVID-related metrics from mid-February to the last week of October, for any of the 50 states. This function also serves as the backend for my Streamlit App: 'covid-by-state.' 
 
 The parameters decided by the user are as follows:
-- **state:** (String) The user enters one of the 50 states to be observed over the entire time period of the dataset.
+- **state:** (String) The user inputs one of the 50 states to be observed over the entire time period of the dataset.
 
-- **metric:** (String) The user inputs their desired metric to be displayed over this period, either cases or deaths.
+- **metric:** (String) The user inputs their desired metric (cases or deaths) to be displayed over this period.
 
 - **date_of_interest**: (DateTime) One or more specific dates on which there may have been superspreader events in the user's inputted state. This plots a vertical line onto the plot at that date index.
 
