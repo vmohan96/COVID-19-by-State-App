@@ -21,3 +21,5 @@ The parameters decided by the user are as follows:
 
 - **n_components:** (Integer) The hyperparameter for the HMM indicating the number of regimes to split the curve
 
+- Test
+
